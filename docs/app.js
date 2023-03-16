@@ -7,7 +7,7 @@ const particles = [];
 
 
 // 炎のサイズを調整する変数
-const flameSize = 1.5;
+const flameSize = 2;
 
 // パーティクルの上昇速度を調整する変数
 const particleRiseSpeed = 0.3;
