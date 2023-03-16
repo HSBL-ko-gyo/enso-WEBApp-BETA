@@ -4,14 +4,26 @@ canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
 
 const particles = [];
-const flameSize = 2.5;
+
+
+// 炎のサイズを調整する変数
+const flameSize = 1.5;
+
+// パーティクルの上昇速度を調整する変数
+const particleRiseSpeed = 0.3;
+
+// パーティクルのサイズ減少速度を調整する変数
+const particleSizeDecreaseSpeed = 0.1;
+
+// パーティクルの横に広がる具合を制限する変数
+const particleSpreadLimit = 1;
 
 function getRandomColor() {
   return `rgba(255, ${Math.floor(Math.random() * 128) + 128}, 0, 0.5)`;
 }
 
 class Particle {
-  constructor() {
+  constructor(x, y) {
     this.x = canvas.width / 2 + Math.random() * 60 * flameSize - 30 * flameSize;
     this.y = canvas.height * 0.8;
     this.size = (Math.random() * 8 + 4) * flameSize;
@@ -20,6 +32,7 @@ class Particle {
     this.color = getRandomColor();
     this.shape = Math.floor(Math.random() * 3); // 0 to 2
     this.wind = 0;
+    this.speedX = (Math.random() - 0.5) * particleSpreadLimit;
   }
 
   draw() {
@@ -47,8 +60,8 @@ class Particle {
 
   update() {
     this.x += this.speedX + this.wind;
-    this.y -= this.speedY;
-    this.size -= 0.35;
+    this.y -= this.speedY * particleRiseSpeed;
+    this.size -= particleSizeDecreaseSpeed;
     this.speedY *= 0.995;
   }
 
