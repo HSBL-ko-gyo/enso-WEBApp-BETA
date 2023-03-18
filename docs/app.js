@@ -25,6 +25,11 @@ const particles = [];
 const fadeInSpeed = 0.01;
 const framesToReachFullAlpha = 60;
 
+const fadeInFrames = 60;      // フェードインにかかるフレーム数
+const displayFrames = 60;     // パーティクルが表示されるフレーム数
+const fadeOutFrames = 60;     // フェードアウトにかかるフレーム数
+
+
 
 // 炎のサイズを調整する変数
 const flameSize = 2;
@@ -99,6 +104,13 @@ class Particle {
         // 加速度を追加
     this.accelX = 0;
     this.accelY = 0;
+
+    
+    // フェードアウト
+    this.state = 'fadeIn';       // パーティクルの状態を表すプロパティ
+    this.fadeInFrames = fadeInFrames;
+    this.displayFrames = displayFrames;
+    this.fadeOutFrames = fadeOutFrames;
     
   }
 
@@ -131,11 +143,25 @@ class Particle {
 
   update() {
     
-    // 透明度を増加させる
-    this.alpha += 1 / this.framesToReachFullAlpha;
-    if (this.alpha > 1) {
-      this.alpha = 1;
-    }
+// 状態に応じて透明度を変更
+if (this.state === 'fadeIn') {
+  this.alpha += 1 / this.fadeInFrames;
+  if (this.alpha >= 1) {
+    this.alpha = 1;
+    this.state = 'display';
+  }
+} else if (this.state === 'display') {
+  this.displayFrames--;
+  if (this.displayFrames <= 0) {
+    this.state = 'fadeOut';
+  }
+} else if (this.state === 'fadeOut') {
+  this.alpha -= 1 / this.fadeOutFrames;
+  if (this.alpha <= 0) {
+    this.alpha = 0;
+    this.state = 'hidden';
+  }
+}
 
     // カーソルやタッチの位置を避ける
     if (cursorPosition.x && cursorPosition.y) {
