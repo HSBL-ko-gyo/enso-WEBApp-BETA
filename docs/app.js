@@ -18,6 +18,15 @@ const particleSizeDecreaseSpeed = 0.1;
 // パーティクルの横に広がる具合を制限する変数
 const particleSpreadLimit = 1;
 
+// カーソルの位置を格納する変数
+let cursorPosition = { x: null, y: null };
+
+// カーソルの位置を取得
+canvas.addEventListener('mousemove', (event) => {
+  cursorPosition.x = event.clientX;
+  cursorPosition.y = event.clientY;
+});
+
 function getRandomColor() {
   return `rgba(255, ${Math.floor(Math.random() * 128) + 128}, 0, 0.5)`;
 }
@@ -33,6 +42,10 @@ class Particle {
     this.shape = Math.floor(Math.random() * 3); // 0 to 2
     this.wind = 0;
     this.speedX = (Math.random() - 0.5) * particleSpreadLimit;
+    
+        // 加速度を追加
+    this.accelX = 0;
+    this.accelY = 0;
   }
 
   draw() {
@@ -59,10 +72,23 @@ class Particle {
 
 
   update() {
+   // カーソルの位置を避ける
+    if (cursorPosition.x && cursorPosition.y) {
+      const distanceX = this.x - cursorPosition.x;
+      const distanceY = this.y - cursorPosition.y;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+      if (distance < 100) {
+        const avoidanceStrength = 2 * (100 - distance) / 100;
+        this.x += (distanceX / distance) * avoidanceStrength;
+        this.y += (distanceY / distance) * avoidanceStrength;
+      }
+    }
     this.x += this.speedX + this.wind;
     this.y -= this.speedY * particleRiseSpeed;
     this.size -= particleSizeDecreaseSpeed;
     this.speedY *= 0.995;
+    
   }
 
   draw() {
