@@ -1,9 +1,29 @@
+//背景系
 const canvas = document.getElementById('flame');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
 
+const backgroundFlickerStrength = 0.9; // 背景のちらつきの強さ
+const brightnessVariationFactor = 0.1;
+const backgroundAdaptationFrames = 30;
+const minBrightnessVariation = 0.1; // 0.1 から 0.9 までの変動範囲
+const maxBrightnessVariation = 0.9;
+
+let frameCount = 0;
+
+const numberOfRows = 10;
+const numberOfColumns = 10;
+
+
+// 現在の背景の明るさを格納する変数
+let currentBackgroundBrightness = 128;
+
 const particles = [];
+
+// フェードイン速度を制御する変数
+const fadeInSpeed = 0.01;
+const framesToReachFullAlpha = 60;
 
 
 // 炎のサイズを調整する変数
@@ -50,12 +70,22 @@ setInterval(() => {
 }, 100);
 
 
+
+
 function getRandomColor() {
   return `rgba(255, ${Math.floor(Math.random() * 128) + 128}, 0, 0.5)`;
 }
 
 class Particle {
+
+  
+  
   constructor(x, y) {
+    // 透明度を追加
+    this.alpha = 0;
+    this.framesToReachFullAlpha = framesToReachFullAlpha;
+
+
     this.x = canvas.width / 2 + Math.random() * 60 * flameSize - 30 * flameSize;
     this.y = canvas.height * 0.8;
     this.size = (Math.random() * 8 + 4) * flameSize;
@@ -69,11 +99,16 @@ class Particle {
         // 加速度を追加
     this.accelX = 0;
     this.accelY = 0;
+    
   }
 
   draw() {
+    ctx.globalAlpha = this.alpha;
+    
     ctx.fillStyle = this.color;
     ctx.beginPath();
+    
+    ctx.globalAlpha = 1;
 
     switch (this.shape) {
       case 0: // Square
@@ -95,6 +130,13 @@ class Particle {
 
 
   update() {
+    
+    // 透明度を増加させる
+    this.alpha += 1 / this.framesToReachFullAlpha;
+    if (this.alpha > 1) {
+      this.alpha = 1;
+    }
+
     // カーソルやタッチの位置を避ける
     if (cursorPosition.x && cursorPosition.y) {
       const distanceX = this.x - cursorPosition.x;
@@ -115,7 +157,10 @@ class Particle {
   }
 
   draw() {
+    
     ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha; // 透明度を適用
+
     if (this.shape === 0) {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -131,6 +176,7 @@ class Particle {
       ctx.closePath();
       ctx.fill();
     }
+    ctx.globalAlpha = this.alpha; // 透明度を適用
   }
 }
 
@@ -166,7 +212,41 @@ function changeWind(particle) {
   particle.wind += (Math.random() * 2 - 1) * 0.05;
 }
 
+///*背景系
+
+function calculateAverageFlameBrightness() {
+  let totalBrightness = 0;
+  let count = 0;
+
+  particles.forEach(particle => {
+    const colorValues = particle.color.match(/\d+/g).map(Number);
+    totalBrightness += colorValues[1];
+    count++;
+  });
+
+  return count ? totalBrightness / count : 128;
+}
+
+function drawBackground() {
+  const cellWidth = canvas.width / numberOfColumns;
+  const cellHeight = canvas.height / numberOfRows;
+
+  for (let i = 0; i < numberOfRows; i++) {
+    for (let j = 0; j < numberOfColumns; j++) {
+      const brightness = (minBrightnessVariation + (maxBrightnessVariation - minBrightnessVariation) / 2) + (maxBrightnessVariation - minBrightnessVariation) / 2 * Math.random();
+      ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+      ctx.fillRect(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
+    }
+  }
+}
+
+
+//*/
+
 function loop() {
+
+  //背景系
+  drawBackground(); // ここで背景を描画
   updateParticles();
   drawParticles();
   addAndDrawParticles();
@@ -178,5 +258,6 @@ function loop() {
   });
   requestAnimationFrame(loop);
 }
+
 
 loop();
