@@ -40,6 +40,12 @@ canvas.addEventListener('touchend', (event) => {
   cursorPosition.y = null;
 });
 
+// タッチがキャンセルされたときに位置をリセット
+canvas.addEventListener('touchcancel', (event) => {
+  cursorPosition.x = null;
+  cursorPosition.y = null;
+});
+
 function getRandomColor() {
   return `rgba(255, ${Math.floor(Math.random() * 128) + 128}, 0, 0.5)`;
 }
