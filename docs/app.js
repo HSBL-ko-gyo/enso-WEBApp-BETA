@@ -34,6 +34,12 @@ canvas.addEventListener('touchmove', (event) => {
   cursorPosition.y = event.touches[0].clientY;
 });
 
+// タッチが終わったときに位置をリセット
+canvas.addEventListener('touchend', (event) => {
+  cursorPosition.x = null;
+  cursorPosition.y = null;
+});
+
 function getRandomColor() {
   return `rgba(255, ${Math.floor(Math.random() * 128) + 128}, 0, 0.5)`;
 }
