@@ -27,6 +27,13 @@ canvas.addEventListener('mousemove', (event) => {
   cursorPosition.y = event.clientY;
 });
 
+// タッチの位置を取得
+canvas.addEventListener('touchmove', (event) => {
+  event.preventDefault();
+  cursorPosition.x = event.touches[0].clientX;
+  cursorPosition.y = event.touches[0].clientY;
+});
+
 function getRandomColor() {
   return `rgba(255, ${Math.floor(Math.random() * 128) + 128}, 0, 0.5)`;
 }
@@ -72,7 +79,7 @@ class Particle {
 
 
   update() {
-   // カーソルの位置を避ける
+    // カーソルやタッチの位置を避ける
     if (cursorPosition.x && cursorPosition.y) {
       const distanceX = this.x - cursorPosition.x;
       const distanceY = this.y - cursorPosition.y;
